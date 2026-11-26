@@ -16,7 +16,7 @@ module.exports = {
   // MongoDB configuration for storing sessions
   MONGODB_URI:
     process.env.MONGODB_URI ||
-    "mongodb+srv://darexmucheri:cMd7EoTwGglJGXwR@cluster0.uwf6z.mongodb.net/holid?retryWrites=true&w=majority&appName=Cluster0",
+    "mongodb+srv://darexmucheri:cMd7EoTwGglJGXwR@cluster0.uwf6z.mongodb.net/holip?retryWrites=true&w=majority&appName=Cluster0",
 
   // Bot behavior (these are defaults, can be overridden per-user in DB)
   AUTO_VIEW_STATUS: process.env.AUTO_VIEW_STATUS || "true",
