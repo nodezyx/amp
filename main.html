@@ -1,0 +1,1770 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101713">
+  <meta name="description" content="Connect your WhatsApp account to SUBZERO MD Mini Bot.">
+  <title>SUBZERO MD — Pairing Portal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #101713;
+      --surface: #151e18;
+      --surface-2: #1b261f;
+      --surface-3: #202d24;
+
+      --mint: #b5f5c7;
+      --mint-strong: #83e9a2;
+      --amber: #ffb86b;
+      --amber-soft: rgba(255,184,107,.10);
+
+      --text: #f2f7f3;
+      --muted: #89968d;
+      --subtle: #59675e;
+
+      --border: rgba(255,255,255,.085);
+      --border-hover: rgba(255,255,255,.16);
+
+      --radius: 17px;
+      --transition: .25s ease;
+      --container: 1120px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      position: relative;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      isolation: isolate;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* BACKGROUND LAYERS */
+
+    .ambient,
+    .grid-background,
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .ambient {
+      z-index: -3;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(131,233,162,.12), transparent 48%),
+        radial-gradient(ellipse at 100% 75%, rgba(255,184,107,.055), transparent 42%);
+    }
+
+    /* Visible square grid */
+
+    .grid-background {
+      z-index: -2;
+      opacity: .75;
+      background-image:
+        linear-gradient(rgba(181,245,199,.075) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(181,245,199,.075) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, black 45%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 0%, black 45%, transparent 100%);
+    }
+
+    .noise {
+      z-index: -1;
+      opacity: .025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+    }
+
+    /* Keep page content above background */
+
+    header, main, footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* NAVBAR */
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 76px;
+      background: rgba(16,23,19,.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: var(--container);
+      height: 100%;
+      padding: 0 24px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -.6px;
+    }
+
+    .brand-logo {
+      width: 43px;
+      height: 43px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 12px;
+      background: rgba(181,245,199,.055);
+      border: 1px solid rgba(181,245,199,.15);
+      box-shadow: 0 0 22px rgba(181,245,199,.06);
+    }
+
+    .brand-logo img {
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #a9b9ad;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--mint-strong);
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(131,233,162,.5);
+    }
+
+    .github-link {
+      width: 37px;
+      height: 37px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: var(--transition);
+    }
+
+    .github-link:hover {
+      color: var(--amber);
+      border-color: var(--amber);
+      background: var(--surface-2);
+    }
+
+    /* MAIN */
+
+    .container {
+      width: min(100% - 48px, var(--container));
+      margin: auto;
+    }
+
+    /* HERO */
+
+    .hero {
+      text-align: center;
+      padding: 90px 20px 60px;
+      animation: enter .7s ease both;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 13px;
+      color: var(--mint);
+      background: rgba(181,245,199,.065);
+      border: 1px solid rgba(181,245,199,.15);
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin-top: 27px;
+      font-size: clamp(38px, 6vw, 60px);
+      line-height: 1.14;
+      font-weight: 800;
+      letter-spacing: -3px;
+    }
+
+    .heading-highlight {
+      position: relative;
+      display: inline-block;
+      color: var(--mint);
+      padding-bottom: 13px;
+    }
+
+    .heading-highlight::after {
+      content: "";
+      position: absolute;
+      left: 1%;
+      bottom: 0;
+      width: 98%;
+      height: 15px;
+      border-top: 3px solid var(--amber);
+      border-radius: 50%;
+      transform: rotate(-2deg);
+      filter: drop-shadow(0 2px 5px rgba(255,184,107,.15));
+    }
+
+    .hero-description {
+      max-width: 510px;
+      margin: 19px auto 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    /* WORKSPACE */
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 20px;
+      align-items: stretch;
+      padding-bottom: 85px;
+      animation: enter .8s ease .1s both;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, rgba(21,30,24,.97), rgba(17,25,19,.97));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color var(--transition);
+    }
+
+    .panel:hover {
+      border-color: var(--border-hover);
+    }
+
+    .panel-header {
+      padding: 25px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .panel-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    .mini-badge {
+      padding: 6px 10px;
+      color: var(--amber);
+      background: var(--amber-soft);
+      border: 1px solid rgba(255,184,107,.19);
+      border-radius: 7px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .7px;
+    }
+
+    .form-content {
+      padding: 30px 28px;
+    }
+
+    /* INPUT */
+
+    .form-label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      transform: translateY(-50%);
+      color: var(--subtle);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .phone-input {
+      width: 100%;
+      height: 54px;
+      padding: 0 16px 0 45px;
+      color: var(--text);
+      background: #0c120e;
+      border: 1px solid var(--border-hover);
+      border-radius: 11px;
+      outline: none;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .phone-input::placeholder {
+      color: #59665d;
+    }
+
+    .phone-input:focus {
+      border-color: var(--mint);
+      box-shadow: 0 0 0 4px rgba(181,245,199,.07);
+    }
+
+    .input-hint {
+      margin-top: 10px;
+      color: var(--subtle);
+      font-size: 11px;
+    }
+
+    .input-hint i {
+      margin-right: 5px;
+      color: var(--amber);
+    }
+
+    /* BUTTONS */
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      min-height: 48px;
+      padding: 0 18px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      font-size: 12px;
+      font-weight: 700;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      flex: 1;
+      color: #101713;
+      background: var(--mint);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #d0ffda;
+      transform: translateY(-2px);
+      box-shadow: 0 7px 22px rgba(131,233,162,.12);
+    }
+
+    .btn-secondary {
+      color: #c4cec7;
+      background: var(--surface-2);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      color: var(--amber);
+      border-color: rgba(255,184,107,.4);
+      background: var(--surface-3);
+    }
+
+    .btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    /* SKELETON */
+
+    .loading {
+      display: none;
+      margin-top: 25px;
+      padding: 22px;
+      background: rgba(255,255,255,.018);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .loading.show {
+      display: block;
+      animation: enter .25s ease;
+    }
+
+    .skeleton {
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,.065);
+      border-radius: 7px;
+    }
+
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.10),
+        transparent
+      );
+      animation: shimmer 1.4s infinite;
+    }
+
+    .skeleton-label {
+      width: 48%;
+      height: 10px;
+      margin: 0 auto 20px;
+    }
+
+    .skeleton-code {
+      width: 75%;
+      height: 37px;
+      margin: 0 auto 17px;
+      border-radius: 9px;
+    }
+
+    .skeleton-description {
+      width: 88%;
+      height: 9px;
+      margin: auto;
+    }
+
+    .skeleton-button {
+      width: 100%;
+      height: 43px;
+      margin-top: 21px;
+      border-radius: 9px;
+    }
+
+    .loading-text {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+
+    /* PAIR RESULT */
+
+    .result {
+      display: none;
+      margin-top: 25px;
+      padding: 21px;
+      background: rgba(255,184,107,.045);
+      border: 1px solid rgba(255,184,107,.2);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .result.show {
+      display: block;
+      animation: enter .35s ease;
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+    }
+
+    .pair-code {
+      margin: 14px 0;
+      color: var(--amber);
+      font-size: clamp(26px, 5vw, 34px);
+      font-weight: 800;
+      letter-spacing: 5px;
+      overflow-wrap: anywhere;
+      text-shadow: 0 0 20px rgba(255,184,107,.09);
+    }
+
+    .result-description {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .copy-result {
+      width: 100%;
+      margin-top: 17px;
+    }
+
+    /* TIMER */
+
+    .timer-box {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .timer-box.show {
+      display: block;
+      animation: enter .3s ease;
+    }
+
+    .timer-label {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .timer {
+      margin-top: 2px;
+      color: var(--amber);
+      font-size: 22px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* MESSAGES */
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .message.show {
+      display: block;
+      animation: enter .25s ease;
+    }
+
+    .message.error {
+      color: #ff9999;
+      background: rgba(255,100,100,.07);
+      border: 1px solid rgba(255,100,100,.15);
+    }
+
+    .message.success {
+      color: var(--mint);
+      background: rgba(181,245,199,.06);
+      border: 1px solid rgba(181,245,199,.13);
+    }
+
+    /* GUIDE */
+
+    .guide-panel {
+      padding: 28px;
+    }
+
+    .guide-heading {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .guide-heading::after {
+      content: "";
+      display: block;
+      width: 48px;
+      height: 3px;
+      margin-top: 7px;
+      background: var(--amber);
+      border-radius: 50%;
+      transform: rotate(-3deg);
+    }
+
+    .guide-description {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .steps {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 23px;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .step-number {
+      width: 35px;
+      height: 35px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      color: var(--mint);
+      background: rgba(181,245,199,.07);
+      border: 1px solid rgba(181,245,199,.13);
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .step h4 {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .step p {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .guide-divider {
+      height: 1px;
+      margin: 29px 0 23px;
+      background: var(--border);
+    }
+
+    /* CHANNEL */
+
+    .channel-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: var(--transition);
+    }
+
+    .channel-card:hover {
+      border-color: rgba(181,245,199,.25);
+    }
+
+    .channel-info {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .channel-icon {
+      width: 37px;
+      height: 37px;
+      display: grid;
+      place-items: center;
+      color: var(--mint);
+      background: rgba(181,245,199,.08);
+      border-radius: 10px;
+    }
+
+    .channel-info strong {
+      display: block;
+      font-size: 11px;
+    }
+
+    .channel-info small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .channel-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    .icon-btn:hover {
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+
+    /* SECURITY */
+
+    .security-note {
+      margin-top: 20px;
+      padding: 13px;
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+      background: rgba(255,255,255,.018);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 10px;
+      line-height: 1.8;
+    }
+
+    .security-note i {
+      color: var(--amber);
+      margin-top: 3px;
+    }
+
+    /* ENHANCED FOOTER */
+
+    footer {
+      position: relative;
+      overflow: hidden;
+      padding: 48px 24px 22px;
+      background: rgba(10,16,12,.96);
+      border-top: 1px solid var(--border);
+    }
+
+    footer::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: min(520px, 85%);
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--mint),
+        var(--amber),
+        transparent
+      );
+      opacity: .7;
+    }
+
+    .footer-inner {
+      max-width: var(--container);
+      margin: auto;
+    }
+
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 45px;
+      padding-bottom: 35px;
+    }
+
+    .footer-identity {
+      max-width: 380px;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .footer-logo {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid rgba(181,245,199,.16);
+      border-radius: 13px;
+      background: rgba(181,245,199,.055);
+    }
+
+    .footer-logo img {
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .footer-brand-text {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .footer-brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .6px;
+    }
+
+    .footer-tagline {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.9;
+    }
+
+    .footer-contact-title {
+      margin-bottom: 14px;
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+
+    .footer-socials {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .footer-social {
+      min-width: 0;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,.025);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 10px;
+      transition: var(--transition);
+    }
+
+    .footer-social i {
+      color: var(--mint);
+      font-size: 14px;
+    }
+
+    .footer-social span {
+      overflow-wrap: anywhere;
+    }
+
+    .footer-social:hover {
+      color: var(--text);
+      background: var(--surface-2);
+      border-color: rgba(181,245,199,.25);
+      transform: translateY(-2px);
+    }
+
+    .footer-bottom {
+      min-height: 52px;
+      padding-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-copy {
+      color: var(--subtle);
+      font-size: 10px;
+    }
+
+    .footer-credit {
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .footer-credit strong {
+      color: var(--mint);
+      font-weight: 700;
+    }
+
+    /* ANIMATIONS */
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes enter {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width: 760px) {
+      .navbar {
+        height: 66px;
+      }
+
+      .nav-inner {
+        padding: 0 18px;
+      }
+
+      .container {
+        width: min(100% - 32px, var(--container));
+      }
+
+      .hero {
+        padding: 70px 10px 40px;
+      }
+
+      .hero h1 {
+        letter-spacing: -2px;
+      }
+
+      .hero-description {
+        font-size: 12px;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding-bottom: 55px;
+      }
+
+      .panel-header {
+        padding: 21px;
+      }
+
+      .form-content,
+      .guide-panel {
+        padding: 23px 21px;
+      }
+
+      .footer-main {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+    }
+
+    @media(max-width: 440px) {
+      .system-status {
+        font-size: 10px;
+      }
+
+      .brand {
+        font-size: 13px;
+      }
+
+      .brand-logo {
+        width: 36px;
+        height: 36px;
+      }
+
+      .hero h1 {
+        font-size: 37px;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+
+      .button-row .btn {
+        width: 100%;
+      }
+
+      .channel-card {
+        align-items: flex-start;
+      }
+
+      .footer-socials {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-bottom: 5px;
+      }
+    }
+
+    @media(prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="ambient"></div>
+<div class="grid-background"></div>
+<div class="noise"></div>
+
+<!-- NAVIGATION -->
+<header class="navbar">
+  <div class="nav-inner">
+
+    <a href="https://github.com/mrfr8nk" class="brand">
+      <div class="brand-logo">
+        <img
+          src="https://mrfranko-cdn.hf.space/media/ice2.png"
+          alt="SUBZERO MD logo"
+        >
+      </div>
+
+      <div>
+        SUBZERO MD
+        <small>Mini Bot Platform</small>
+      </div>
+    </a>
+
+    <div class="nav-right">
+
+      <div class="system-status">
+        <span class="status-dot"></span>
+        Pairing portal
+      </div>
+
+      <a class="github-link"
+         href="https://github.com/mrfr8nk"
+         target="_blank"
+         rel="noopener noreferrer"
+         aria-label="GitHub">
+
+        <i class="fa-brands fa-github"></i>
+      </a>
+
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <div class="eyebrow">
+      <i class="fa-solid fa-bolt"></i>
+      SUBZERO CONNECTION SYSTEM
+    </div>
+
+    <h1>
+      Connect your<br>
+      <span class="heading-highlight">WhatsApp account.</span>
+    </h1>
+
+    <p class="hero-description">
+      Generate your unique pairing code and connect your WhatsApp
+      account to SUBZERO MD Mini Bot in just a few steps.
+    </p>
+
+  </section>
+
+  <!-- WORKSPACE -->
+  <section class="container workspace">
+
+    <!-- PAIRING PANEL -->
+    <div class="panel">
+
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Device pairing</div>
+          <div class="panel-subtitle">Connect a new WhatsApp device</div>
+        </div>
+
+        <span class="mini-badge">PAIR CODE</span>
+      </div>
+
+      <div class="form-content">
+
+        <form id="pair-form">
+
+          <label class="form-label" for="phone-number">
+            WhatsApp phone number
+          </label>
+
+          <div class="input-wrapper">
+            <i class="fa-solid fa-phone input-icon"></i>
+
+            <input
+              type="tel"
+              id="phone-number"
+              class="phone-input"
+              placeholder="+263 719 646 303"
+              autocomplete="tel"
+              inputmode="tel"
+              maxlength="17"
+              required
+            >
+          </div>
+
+          <div class="input-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            Include your country code. Example: +263 for Zimbabwe.
+          </div>
+
+          <div class="button-row">
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    id="generate-code">
+
+              <i class="fa-solid fa-key"></i>
+              Generate pairing code
+
+            </button>
+
+            <button type="button"
+                    class="btn btn-secondary"
+                    id="clear-btn">
+
+              <i class="fa-solid fa-rotate-left"></i>
+              Reset
+
+            </button>
+
+          </div>
+
+        </form>
+
+        <!-- SKELETON LOADING -->
+        <div class="loading"
+             id="loading-spinner"
+             aria-live="polite"
+             aria-label="Generating pairing code">
+
+          <div class="skeleton skeleton-label"></div>
+          <div class="skeleton skeleton-code"></div>
+          <div class="skeleton skeleton-description"></div>
+          <div class="skeleton skeleton-button"></div>
+
+          <div class="loading-text">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            Generating your pairing code...
+          </div>
+
+        </div>
+
+        <!-- MESSAGE -->
+        <div class="message"
+             id="message"
+             role="status"
+             aria-live="polite">
+        </div>
+
+        <!-- RESULT -->
+        <div class="result"
+             id="pair"
+             aria-live="polite">
+
+          <div class="result-label">
+            YOUR WHATSAPP PAIRING CODE
+          </div>
+
+          <div class="pair-code" id="pair-code">
+            --------
+          </div>
+
+          <div class="result-description">
+            Open WhatsApp → Linked devices → Link with phone number.
+          </div>
+
+          <button class="btn btn-primary copy-result"
+                  id="copy-code"
+                  type="button">
+
+            <i class="fa-regular fa-copy"></i>
+            Copy pairing code
+
+          </button>
+
+        </div>
+
+        <!-- TIMER -->
+        <div class="timer-box" id="timer-container">
+
+          <div class="timer-label">
+            PAIRING CODE EXPIRATION
+          </div>
+
+          <div class="timer" id="timer">
+            01:00
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GUIDE PANEL -->
+    <aside class="panel guide-panel">
+
+      <div class="guide-heading">
+        How to connect
+      </div>
+
+      <p class="guide-description">
+        Follow these simple steps to connect your WhatsApp account.
+      </p>
+
+      <div class="steps">
+
+        <div class="step">
+          <div class="step-number">01</div>
+          <div>
+            <h4>Enter your number</h4>
+            <p>
+              Provide your WhatsApp number with its international
+              country code.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">02</div>
+          <div>
+            <h4>Generate your code</h4>
+            <p>
+              Click generate and wait for your unique pairing code.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">03</div>
+          <div>
+            <h4>Open WhatsApp</h4>
+            <p>
+              Go to Settings, Linked Devices, then Link with
+              phone number.
+            </p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-number">04</div>
+          <div>
+            <h4>Complete connection</h4>
+            <p>
+              Enter your pairing code in WhatsApp to finish
+              the connection.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="guide-divider"></div>
+
+      <!-- WHATSAPP CHANNEL -->
+      <div class="channel-card">
+
+        <div class="channel-info">
+
+          <div class="channel-icon">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+
+          <div>
+            <strong>SUBZERO MD Channel</strong>
+            <small>Updates, releases and announcements</small>
+          </div>
+
+        </div>
+
+        <div class="channel-actions">
+
+          <button class="icon-btn"
+                  id="join-channel"
+                  aria-label="Join channel"
+                  title="Join channel">
+
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+          </button>
+
+          <button class="icon-btn"
+                  id="copy-link"
+                  aria-label="Copy channel link"
+                  title="Copy channel link">
+
+            <i class="fa-solid fa-link"></i>
+
+          </button>
+
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="security-note">
+
+        <i class="fa-solid fa-shield-halved"></i>
+
+        <span>
+          Never share your pairing code with anyone.
+          Only enter it inside your official WhatsApp application.
+        </span>
+
+      </div>
+
+    </aside>
+
+  </section>
+
+</main>
+
+<!-- ENHANCED FOOTER -->
+<footer>
+
+  <div class="footer-inner">
+
+    <div class="footer-main">
+
+      <div class="footer-identity">
+
+        <div class="footer-brand">
+
+          <div class="footer-logo">
+            <img
+              src="https://mrfranko-cdn.hf.space/media/ice2.png"
+              alt="SUBZERO MD logo"
+            >
+          </div>
+
+          <div>
+            <div class="footer-brand-text">SUBZERO MD</div>
+            <small>Mini Bot Platform</small>
+          </div>
+
+        </div>
+
+        <p class="footer-tagline">
+          A smarter WhatsApp bot experience.
+          Built with care by Mr Frank OFC.
+          Stay connected with SUBZERO MD.
+        </p>
+
+      </div>
+
+      <div class="footer-contact">
+
+        <div class="footer-contact-title">
+          Connect with the developer
+        </div>
+
+        <div class="footer-socials">
+
+          <a class="footer-social"
+             href="https://mrfrankfc.com"
+             target="_blank"
+             rel="noopener noreferrer">
+
+            <i class="fa-solid fa-globe"></i>
+            <span>Portfolio · mrfrankfc.com</span>
+
+          </a>
+
+          <a class="footer-social"
+             href="https://wa.me/263719646303"
+             target="_blank"
+             rel="noopener noreferrer">
+
+            <i class="fa-brands fa-whatsapp"></i>
+            <span>WhatsApp · +263 719 646 303</span>
+
+          </a>
+
+          <a class="footer-social"
+             href="https://github.com/mrfr8nk"
+             target="_blank"
+             rel="noopener noreferrer">
+
+            <i class="fa-brands fa-github"></i>
+            <span>GitHub · @mrfr8nk</span>
+
+          </a>
+
+          <a class="footer-social"
+             href="https://whatsapp.com/channel/0029VagQEmB002T7MWo3Sj1D"
+             target="_blank"
+             rel="noopener noreferrer">
+
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>SUBZERO MD Channel</span>
+
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+
+      <div class="footer-copy">
+        © <span id="currentYear"></span> SUBZERO MD. All rights reserved.
+      </div>
+
+      <div class="footer-credit">
+        Designed & developed by <strong>Mr Frank OFC</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+</footer>
+
+<script>
+(() => {
+  'use strict';
+
+  const channelURL =
+    'https://whatsapp.com/channel/0029VagQEmB002T7MWo3Sj1D';
+
+  const elements = {
+    form: document.getElementById('pair-form'),
+    phone: document.getElementById('phone-number'),
+    generate: document.getElementById('generate-code'),
+    clear: document.getElementById('clear-btn'),
+    spinner: document.getElementById('loading-spinner'),
+    pair: document.getElementById('pair'),
+    pairCode: document.getElementById('pair-code'),
+    copy: document.getElementById('copy-code'),
+    timerContainer: document.getElementById('timer-container'),
+    timer: document.getElementById('timer'),
+    message: document.getElementById('message'),
+    join: document.getElementById('join-channel'),
+    copyLink: document.getElementById('copy-link')
+  };
+
+  let countdown = null;
+  let timeLeft = 60;
+  let currentCode = null;
+  let requestController = null;
+  let copyTimeout = null;
+  let linkTimeout = null;
+
+  document.getElementById('currentYear').textContent =
+    new Date().getFullYear();
+
+  function showMessage(message, type = 'error') {
+    elements.message.textContent = message;
+    elements.message.className = `message show ${type}`;
+  }
+
+  function hideMessage() {
+    elements.message.className = 'message';
+    elements.message.textContent = '';
+  }
+
+  function stopTimer() {
+    clearInterval(countdown);
+    countdown = null;
+    elements.timerContainer.classList.remove('show');
+  }
+
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remaining = seconds % 60;
+
+    return `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
+  }
+
+  function startTimer() {
+    stopTimer();
+
+    timeLeft = 60;
+    elements.timer.textContent = formatTime(timeLeft);
+    elements.timerContainer.classList.add('show');
+
+    countdown = setInterval(() => {
+      timeLeft--;
+
+      elements.timer.textContent = formatTime(timeLeft);
+
+      if (timeLeft <= 0) {
+        stopTimer();
+        currentCode = null;
+
+        elements.pair.classList.remove('show');
+
+        showMessage(
+          'Your pairing code has expired. Generate a new code to continue.',
+          'error'
+        );
+      }
+    }, 1000);
+  }
+
+  function setLoading(loading) {
+    elements.generate.disabled = loading;
+    elements.phone.disabled = loading;
+
+    elements.spinner.classList.toggle('show', loading);
+
+    elements.generate.innerHTML = loading
+      ? '<i class="fa-solid fa-spinner fa-spin"></i> Generating...'
+      : '<i class="fa-solid fa-key"></i> Generate pairing code';
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return;
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+
+    document.body.appendChild(textarea);
+    textarea.select();
+
+    const copied = document.execCommand('copy');
+    textarea.remove();
+
+    if (!copied) {
+      throw new Error('Clipboard access unavailable');
+    }
+  }
+
+  function displayCode(code) {
+    currentCode = code;
+
+    elements.pairCode.textContent = code;
+    elements.pair.classList.add('show');
+
+    hideMessage();
+    startTimer();
+  }
+
+  elements.form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const number = elements.phone.value.replace(/\D/g, '');
+
+    if (!number) {
+      showMessage('Please enter your WhatsApp phone number.');
+      elements.phone.focus();
+      return;
+    }
+
+    if (number.length < 7 || number.length > 15) {
+      showMessage('Please enter a valid international phone number.');
+      elements.phone.focus();
+      return;
+    }
+
+    if (requestController) {
+      requestController.abort();
+    }
+
+    const controller = new AbortController();
+    requestController = controller;
+
+    currentCode = null;
+    stopTimer();
+
+    elements.pair.classList.remove('show');
+    hideMessage();
+    setLoading(true);
+
+    elements.phone.value = '+' + number;
+
+    try {
+      const response = await fetch(
+        `/code?number=${encodeURIComponent(number)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          },
+          signal: controller.signal
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('The pairing service is currently unavailable.');
+      }
+
+      const data = await response.json();
+
+      if (!data || !data.code) {
+        throw new Error('No pairing code was returned. Please try again.');
+      }
+
+      if (requestController !== controller) return;
+
+      displayCode(String(data.code));
+
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+      if (requestController !== controller) return;
+
+      console.error('Pairing error:', error);
+
+      showMessage(
+        error.message || 'Unable to generate your code. Please try again.'
+      );
+
+    } finally {
+      if (requestController === controller) {
+        requestController = null;
+        setLoading(false);
+      }
+    }
+  });
+
+  elements.copy.addEventListener('click', async () => {
+    if (!currentCode) return;
+
+    try {
+      await copyText(currentCode);
+
+      clearTimeout(copyTimeout);
+
+      elements.copy.innerHTML =
+        '<i class="fa-solid fa-check"></i> Code copied!';
+
+      showMessage(
+        'Your pairing code has been copied successfully.',
+        'success'
+      );
+
+      copyTimeout = setTimeout(() => {
+        elements.copy.innerHTML =
+          '<i class="fa-regular fa-copy"></i> Copy pairing code';
+      }, 2000);
+
+    } catch (error) {
+      showMessage('Unable to copy automatically. Please copy manually.');
+    }
+  });
+
+  elements.clear.addEventListener('click', () => {
+    if (requestController) {
+      requestController.abort();
+      requestController = null;
+    }
+
+    stopTimer();
+
+    currentCode = null;
+
+    elements.form.reset();
+    elements.phone.disabled = false;
+
+    elements.pair.classList.remove('show');
+    elements.pairCode.textContent = '--------';
+
+    clearTimeout(copyTimeout);
+
+    elements.copy.innerHTML =
+      '<i class="fa-regular fa-copy"></i> Copy pairing code';
+
+    setLoading(false);
+    hideMessage();
+
+    elements.phone.focus();
+  });
+
+  elements.join.addEventListener('click', () => {
+    window.open(channelURL, '_blank', 'noopener,noreferrer');
+  });
+
+  elements.copyLink.addEventListener('click', async () => {
+    try {
+      await copyText(channelURL);
+
+      clearTimeout(linkTimeout);
+
+      elements.copyLink.innerHTML =
+        '<i class="fa-solid fa-check"></i>';
+
+      showMessage('WhatsApp channel link copied!', 'success');
+
+      linkTimeout = setTimeout(() => {
+        elements.copyLink.innerHTML =
+          '<i class="fa-solid fa-link"></i>';
+      }, 2000);
+
+    } catch (error) {
+      showMessage('Unable to copy the channel link.');
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
